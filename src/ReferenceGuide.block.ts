@@ -15,8 +15,7 @@ function flatten(input: any[]) {
 		const id = node.id || counter++;
 		let children: any[] = [];
 		(node.children || []).forEach((child: any) => {
-			if (child.type === 'text' && child.value === '\n') {
-			} else {
+			if (!(child.type == 'text' && child.value === '\n')) {
 				const childNode = { ...child };
 				childNode.parent = node.id;
 				childNode.id = counter++;

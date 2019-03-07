@@ -14,6 +14,7 @@
     "@dojo/framework": "^5.0.0",
     "hast-to-hyperscript": "^6.0.0",
     "isomorphic-fetch": "^2.2.1",
+    "rehype-slug": "^2.0.2",
     "rehype-stringify": "^5.0.0",
     "remark-parse": "^6.0.3",
     "remark-rehype": "^4.0.0",

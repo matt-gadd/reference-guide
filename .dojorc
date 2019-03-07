@@ -2,7 +2,15 @@
 	"build-app": {
 		"build-time-render": {
 			"root": "root",
-			"paths": [ "#i18n" ]
+			"paths": [
+				"i18n",
+				"i18n/introduction",
+				"i18n/basic-usage",
+				"i18n/bundles",
+				"i18n/i18n-dojo-apps",
+				"i18n/formatting",
+				"i18n/standalone"
+			]
 		}
 	},
 	"test-intern": {},

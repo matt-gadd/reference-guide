@@ -7,19 +7,22 @@ const markdown = require('remark-parse');
 const remark2rehype = require('remark-rehype');
 const toH = require('hast-to-hyperscript');
 const { v } = require('@dojo/framework/widget-core/d');
+const slug = require('rehype-slug')
 
 function process(content: string) {
+	let counter = 0;
 	const pipeline = unified()
 		.use(markdown, { commonmark: true })
 		.use(remark2rehype)
+		.use(slug);
 
 	const nodes = pipeline.parse(content);
 	const result = pipeline.runSync(nodes);
-	return toH((...args: any[]) => v(...args), result);
+	return toH((tag: string, props: any, children: any[]) => v(tag, { ...props, key: counter++ }, children), result);
 }
 
 export default function ({ url }: { url: string }) {
-	url = `https://raw.githubusercontent.com/dojo/framework/master/docs/en/i18n/${url.substr(1)}`;
+	url = `https://raw.githubusercontent.com/dojo/framework/master/docs/en/i18n/${url}.md`;
 	const btrcache = path.resolve(__dirname, '../', '.btrcache');
 	if (!fs.existsSync(btrcache)) {
 		fs.mkdirSync(btrcache);
