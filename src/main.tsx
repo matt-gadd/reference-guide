@@ -6,6 +6,7 @@ import Registry from '@dojo/framework/widget-core/Registry';
 import { registerRouterInjector } from '@dojo/framework/routing/RouterInjector';
 import StateHistory from '@dojo/framework/routing/history/StateHistory';
 import Link from '@dojo/framework/routing/Link';
+import './routerHack';
 
 import ReferenceGuide from './ReferenceGuide';
 import ReferenceGuideContent from './ReferenceGuideContent';
@@ -16,70 +17,49 @@ const registry = new Registry();
 
 registerRouterInjector(routes, registry, { HistoryManager: StateHistory });
 
-const hash = () => {
-	const id = window.location.hash.replace('#', '');
-	if (id) {
-		const observer = new MutationObserver(() => {
-			const element = document.getElementById(id)
-			if (element) {
-				observer.disconnect();
-				element && element.scrollIntoView(true);
-			}
-		});
-		observer.observe(document.documentElement, {
-			childList: true,
-			subtree: true
-		});
-	}
+const renderToc = (name: string, items: any) => {
+	return items.map(({ value, href, children = [] }: any) => {
+		href = href.replace(/^\.\//, '').replace('.md', '');
+		return (
+			<ul>
+				<li>
+					<Link to={ `${name}-content` } params={ { href } }>{ value }</Link>
+					{ children.length && renderToc(name, children) }
+				</li>
+			</ul>
+		);
+	});
 }
 
-const pushState = history.pushState;
-history.pushState = (...args: any[]) => {
-    pushState.apply(history, args);
-	hash();
-};
+const addPages = (name: string, toc: any) => {
+	(window as any).__btrPaths = toc.map(({ href }: { href: string }) => `${name}/${href.replace(/^\.\//, '').replace(/#.*/, '').replace('.md', '')}`);
+}
 
-hash();
+const renderReferenceGuide = (name: string) => (
+	<Outlet id={ `${name}-content` } renderer={ ({ params: { href } }) => {
+		return <ReferenceGuideContent url={ href } renderer={ ({ content }) => content } />
+	} } />
+)
+
+const render = (name: string, url: string) => (
+	<div>
+		<div classes={ ['side-nav'] }>
+			<ReferenceGuide url={ url } renderer={ ({ toc }) => {
+				addPages(name, toc);
+				return renderToc(name, toc)
+			}} />
+		</div>
+		<div classes={ ['content'] }>
+			{ renderReferenceGuide(name) }
+		</div>
+	</div>
+);
 
 class App extends WidgetBase {
 	render() {
 		const url = "https://raw.githubusercontent.com/dojo/framework/master/docs/en/i18n/index.md";
 		return (
-			<div>
-				<Outlet id="i18n" renderer={ () => {
-					return (
-						<ReferenceGuide url={ url } renderer={ ({ toc }) => {
-							const table = toc.map(({ value, href, children }: any) => {
-								href = href.replace(/^\.\//, '').replace(/#.*/, '').replace('.md', '');
-								return (
-									<ul>
-										<li>
-										<Link to="i18n-content" params={ { href } }>{ value }</Link>
-										<ul>{ children.map(({ value , href }: { value: string, href: string }) => {
-											href = href.replace(/^\.\//, '').replace('.md', '');
-											return (
-												<li>
-													<Link to="i18n-content" params={ { href } }>{ value }</Link>
-												</li>
-											)
-										}) }</ul>
-										</li>
-									</ul>
-								)
-							});
-							return (
-								<div>
-									{ table }
-									<Outlet id="i18n-content" renderer={ ({ params }) => {
-										const { href } = params;
-										return <ReferenceGuideContent url={ href } renderer={ ({ content }) => content } />
-									} } />
-								</div>
-							);
-						}} />
-					);
-				} } />
-			</div>
+			<Outlet id="i18n" renderer={ () => render('i18n', url) } />
 		);
 	}
 }
