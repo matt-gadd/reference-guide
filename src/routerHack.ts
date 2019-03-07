@@ -1,3 +1,4 @@
+
 const hash = () => {
 	const id = window.location.hash.replace('#', '');
 	if (id) {
@@ -27,5 +28,5 @@ history.pushState = (...args: any[]) => {
 	hash();
 };
 
-hash();
+export default hash;
 

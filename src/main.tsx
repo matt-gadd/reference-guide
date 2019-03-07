@@ -5,7 +5,7 @@ import Outlet from '@dojo/framework/routing/Outlet';
 import Registry from '@dojo/framework/widget-core/Registry';
 import { registerRouterInjector } from '@dojo/framework/routing/RouterInjector';
 import StateHistory from '@dojo/framework/routing/history/StateHistory';
-import './routerHack';
+import hash from './routerHack';
 
 import routes from './routes';
 import ReferenceGuide from './ReferenceGuide';
@@ -27,3 +27,4 @@ class App extends WidgetBase {
 
 const r = renderer(() => <App />);
 r.mount({ registry, domNode: document.getElementById('root') as HTMLElement });
+hash();
