@@ -1,0 +1,10 @@
+{
+	"build-app": {
+		"build-time-render": {
+			"root": "root",
+			"paths": [ "#i18n" ]
+		}
+	},
+	"test-intern": {},
+	"create-app": {}
+}
